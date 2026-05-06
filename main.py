@@ -161,8 +161,9 @@ def search_locations(query: str) -> list:
 
 def main():
     # --- Current Weather ---
-    print("=== Current Weather: London ===")
-    data = get_current_weather("London")
+    query_location = input("Enter a location: ")
+    print(f"=== Current Weather: {query_location} ===")
+    data = get_current_weather(query_location)
     loc = data["location"]
     cur = data["current"]
 

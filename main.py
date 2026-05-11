@@ -5,6 +5,9 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
+# MONGODB URL/API
+
+# Weather API Key
 API_KEY = os.getenv("API_KEY")
 BASE_URL = "https://api.weatherapi.com/v1"
 
@@ -23,5 +26,14 @@ data = response.json()
 print(data)
 weather_current = data["current"]
 weather_location = data["location"]
+
+# Dictionary that will be sent to MongoDB
+# match_prediction will be used to showcase
+weather_data_model = {
+    "location": weather_location['name'],
+    "temperature": weather_current['temp_c'],
+    "date": datetime.now(),
+    "match_prediction": 'True'
+}
 
 print(f"Location: {weather_location['name']}, current temperature is {weather_current['temp_c']} degrees Celsius")

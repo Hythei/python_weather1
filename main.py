@@ -5,11 +5,14 @@ from dotenv import load_dotenv
 from pymongo import MongoClient
 from pymongo.server_api import ServerApi
 
+
 load_dotenv()
 
 # MONGODB URL/API
 MONGODB_URL = os.getenv("MONGODB_URL")
 client = MongoClient(MONGODB_URL, server_api=ServerApi('1'))
+
+db = client.weather_db
 # Weather API Key
 API_KEY = os.getenv("API_KEY")
 BASE_URL = "https://api.weatherapi.com/v1"
@@ -20,6 +23,9 @@ try:
     print("Connection to MongoDB successful")
 except Exception as e:
     print(f"Connection to MongoDB failed: {e}")
+
+col1 = db["weather_information"]
+print(col1)
 
 location = input("Enter a location: ")
 

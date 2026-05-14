@@ -12,20 +12,20 @@ load_dotenv()
 MONGODB_URL = os.getenv("MONGODB_URL")
 client = MongoClient(MONGODB_URL, server_api=ServerApi('1'))
 
-db = client.weather_db
 # Weather API Key
 API_KEY = os.getenv("API_KEY")
 BASE_URL = "https://api.weatherapi.com/v1"
 
 # This thing checks that we have a successful MongoDB connection
-try:
-    client.admin.command('ping')
-    print("Connection to MongoDB successful")
-except Exception as e:
-    print(f"Connection to MongoDB failed: {e}")
+def check_mongodb_connection():
+    try:
+        client.admin.command('ping')
+        print("Connection to MongoDB successful")
+    except Exception as e:
+        print(f"Connection to MongoDB failed: {e}")
 
-col1 = db["weather_information"]
-print(col1)
+def get_mongo_db():
+    return client["weather_test1"]
 
 location = input("Enter a location: ")
 
@@ -52,5 +52,15 @@ weather_data_model = {
     "match_prediction": 'True'
 }
 
+
+
 print(f"Location: {weather_location['name']}, current temperature is {weather_current['temp_c']} degrees Celsius")
 print(f"Date: {datetime.now()}")
+
+check_mongodb_connection()
+
+db = get_mongo_db()
+collection = db["weather_information"]
+item_details = collection.find({})
+for item in item_details:
+    print(item)

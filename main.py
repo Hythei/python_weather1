@@ -27,21 +27,24 @@ def check_mongodb_connection():
 def get_mongo_db():
     return client["weather_test1"]
 
-location = input("Enter a location: ")
+def weather_query():
+    location = input("Enter a location: ")
+    params = {
+        "key": API_KEY,
+        "q": location,
+        "aqi": "no"
+    }
+    response = requests.get(f"{BASE_URL}/current.json", params=params)
+    data = response.json()
+    current = data["current"]
+    location = data["location"]
+    return current, location
 
-params = {
-    "key": API_KEY,
-    "q":location,
-    "aqi":"no"
-}
+weather_current, weather_location = weather_query()
 
-# Current.json refers to current weather
-response = requests.get(f"{BASE_URL}/current.json", params=params)
-
-data = response.json()
-print(data)
-weather_current = data["current"]
-weather_location = data["location"]
+def print_weather_data(weather_current, weather_location):
+    print(f"Location: {weather_location['name']}, current temperature is {weather_current['temp_c']} degrees Celsius")
+    print(f"Date: {datetime.now()}")
 
 # Dictionary that will be sent to MongoDB
 # match_prediction will be used to showcase CRUD-functions
@@ -54,8 +57,7 @@ weather_data_model = {
 
 
 
-print(f"Location: {weather_location['name']}, current temperature is {weather_current['temp_c']} degrees Celsius")
-print(f"Date: {datetime.now()}")
+
 
 check_mongodb_connection()
 

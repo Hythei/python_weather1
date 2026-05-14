@@ -38,32 +38,38 @@ def weather_query():
     data = response.json()
     current = data["current"]
     location = data["location"]
-    return current, location
+    # Dictionary that will be sent to MongoDB
+    # match_prediction will be used to showcase CRUD-functions
+    data_model = {
+        "location": location['name'],
+        "temperature": current['temp_c'],
+        "date": datetime.now(),
+        "match_prediction": 'True'
+    }
+    return current, location, data_model
 
-weather_current, weather_location = weather_query()
+
 
 def print_weather_data(weather_current, weather_location):
     print(f"Location: {weather_location['name']}, current temperature is {weather_current['temp_c']} degrees Celsius")
     print(f"Date: {datetime.now()}")
 
-# Dictionary that will be sent to MongoDB
-# match_prediction will be used to showcase CRUD-functions
-weather_data_model = {
-    "location": weather_location['name'],
-    "temperature": weather_current['temp_c'],
-    "date": datetime.now(),
-    "match_prediction": 'True'
-}
 
 
 
+def mongodb_find():
+    db = get_mongo_db()
+    collection = db["weather_information"]
+    item_details = collection.find({})
+    for item in item_details:
+        print(item)
 
 
-check_mongodb_connection()
 
-db = get_mongo_db()
-collection = db["weather_information"]
-collection.insert_one(weather_data_model)
-item_details = collection.find({})
-for item in item_details:
-    print(item)
+def main():
+    check_mongodb_connection()
+    weather_current, weather_location, weather_data_model = weather_query()
+    print_weather_data(weather_current, weather_location)
+
+if __name__ == "__main__":
+    main()

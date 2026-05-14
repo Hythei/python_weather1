@@ -61,6 +61,7 @@ check_mongodb_connection()
 
 db = get_mongo_db()
 collection = db["weather_information"]
+collection.insert_one(weather_data_model)
 item_details = collection.find({})
 for item in item_details:
     print(item)

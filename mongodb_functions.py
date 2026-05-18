@@ -1,0 +1,1 @@
+# This file will contain functions related to MongoDB when I get around to tidying up the main-file

@@ -77,7 +77,6 @@ def mongodb_find():
         else:
             print("Invalid choice. Please try again.")
             return
-        item_details = collection.find({})
         for item in item_details:
             print(item)
 
@@ -97,7 +96,7 @@ def main():
     weather_current, weather_location, weather_data_model = weather_query()
     print_weather_data(weather_current, weather_location)
     mongodb_send(weather_data_model)
-#    mongodb_find()
+    mongodb_find()
 
 if __name__ == "__main__":
     main()

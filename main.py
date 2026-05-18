@@ -27,6 +27,7 @@ def check_mongodb_connection():
 def get_mongo_db():
     return client["weather_test1"]
 
+
 def weather_query():
     location = input("Enter a location: ")
     params = {
@@ -64,12 +65,20 @@ def mongodb_find():
     for item in item_details:
         print(item)
 
-
+def mongodb_send(data_model):
+    db = get_mongo_db()
+    collection = db["weather_information"]
+    enquiry = input("Send data to MongoDB? (y/n): ")
+    if enquiry == 'n':
+        return
+    else:
+        collection.insert_one(data_model)
 
 def main():
     check_mongodb_connection()
     weather_current, weather_location, weather_data_model = weather_query()
     print_weather_data(weather_current, weather_location)
+    mongodb_find()
 
 if __name__ == "__main__":
     main()

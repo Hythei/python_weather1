@@ -61,9 +61,25 @@ def print_weather_data(weather_current, weather_location):
 def mongodb_find():
     db = get_mongo_db()
     collection = db["weather_information"]
-    item_details = collection.find({})
-    for item in item_details:
-        print(item)
+    # Suppose we can leave the find() empty and it will return all the data
+    enquiry = input("Find data in MongoDB? (y/n): ")
+    if enquiry == 'n':
+        return
+    else:
+        print("Type 1 to search for all documents within the collection.")
+        print("Type 2 to search for a specific document according the location.")
+        choice = input("Specify: ")
+        if choice == '1':
+            item_details = collection.find({})
+        elif choice == '2':
+            location = input("Enter a location: ")
+            item_details = collection.find({"location" : location})
+        else:
+            print("Invalid choice. Please try again.")
+            return
+        item_details = collection.find({})
+        for item in item_details:
+            print(item)
 
 def mongodb_send(data_model):
     db = get_mongo_db()
@@ -73,12 +89,15 @@ def mongodb_send(data_model):
         return
     else:
         collection.insert_one(data_model)
+        print("Data sent to MongoDB")
+
 
 def main():
     check_mongodb_connection()
     weather_current, weather_location, weather_data_model = weather_query()
     print_weather_data(weather_current, weather_location)
-    mongodb_find()
+    mongodb_send(weather_data_model)
+#    mongodb_find()
 
 if __name__ == "__main__":
     main()

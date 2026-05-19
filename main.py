@@ -4,6 +4,7 @@ from datetime import datetime
 from dotenv import load_dotenv
 from pymongo import MongoClient
 from pymongo.server_api import ServerApi
+from bson.objectid import ObjectId
 
 
 load_dotenv()
@@ -45,7 +46,7 @@ def weather_query():
         "location": location['name'],
         "temperature": current['temp_c'],
         "date": datetime.now(),
-        "match_prediction": 'True'
+        "match_prediction": True
     }
     return current, location, data_model
 
@@ -96,10 +97,18 @@ def mongodb_update():
     print("Use the ObjectId to update the document. This just changes the match_prediction to False.")
     mongodb_find()
     target_id = input("Enter the ObjectId: ")
-    collection.update_one({"_id" : target_id}, {"$set" : {"match_prediction" : "False"}})
+
+    try:
+        object_id = ObjectId(target_id)
+    except:
+        print("Invalid ObjectId. Please try again.")
+        return
+
+    collection.update_one({"_id" : object_id}, {"$set" : {"match_prediction" : False}})
     print("Document updated:")
-    collection.find_one({"_id" : target_id})
-    pass
+    updated_document = collection.find_one({"_id" : object_id})
+    print(updated_document)
+
 
 
 def main():

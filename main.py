@@ -90,13 +90,25 @@ def mongodb_send(data_model):
         collection.insert_one(data_model)
         print("Data sent to MongoDB")
 
+def mongodb_update():
+    db = get_mongo_db()
+    collection = db["weather_information"]
+    print("Use the ObjectId to update the document. This just changes the match_prediction to False.")
+    mongodb_find()
+    target_id = input("Enter the ObjectId: ")
+    collection.update_one({"_id" : target_id}, {"$set" : {"match_prediction" : "False"}})
+    print("Document updated:")
+    collection.find_one({"_id" : target_id})
+    pass
+
 
 def main():
     check_mongodb_connection()
-    weather_current, weather_location, weather_data_model = weather_query()
-    print_weather_data(weather_current, weather_location)
-    mongodb_send(weather_data_model)
-    mongodb_find()
+    # weather_current, weather_location, weather_data_model = weather_query()
+    # print_weather_data(weather_current, weather_location)
+    # mongodb_send(weather_data_model)
+    # mongodb_find()
+    mongodb_update()
 
 if __name__ == "__main__":
     main()

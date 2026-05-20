@@ -95,7 +95,6 @@ def mongodb_update():
     db = get_mongo_db()
     collection = db["weather_information"]
     print("Use the ObjectId to update the document. This just changes the match_prediction to False.")
-    mongodb_find()
     target_id = input("Enter the ObjectId: ")
 
     try:
@@ -109,15 +108,31 @@ def mongodb_update():
     updated_document = collection.find_one({"_id" : object_id})
     print(updated_document)
 
-
+def mongodb_delete():
+    db = get_mongo_db()
+    collection = db["weather_information"]
+    print("Use the ObjectId to delete the document.")
+    # Initially we'll just use the object_id to delete the document
+    # Once delete_one has been proven to work, we'll see if delete_many works with location
+    target_id = input("Enter the ObjectId: ")
+    try:
+        object_id = ObjectId(target_id)
+    except:
+        print("Invalid ObjectId. Please try again.")
+        return
+    doc_to_be_removed = collection.find_one({"_id": object_id})
+    print("Following document will be deleted from the collection")
+    print(doc_to_be_removed)
+    collection.delete_one({"_id": object_id})
 
 def main():
     check_mongodb_connection()
     # weather_current, weather_location, weather_data_model = weather_query()
     # print_weather_data(weather_current, weather_location)
     # mongodb_send(weather_data_model)
-    # mongodb_find()
-    mongodb_update()
+    mongodb_find()
+    # mongodb_update()
+    # mongodb_delete()
 
 if __name__ == "__main__":
     main()

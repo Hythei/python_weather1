@@ -28,6 +28,7 @@ def check_mongodb_connection():
 def get_mongo_db():
     return client["weather_test1"]
 
+# Write a function that combines weather query, weather printing, and mongodb_send here!
 
 def weather_query():
     location = input("Enter a location: ")
@@ -48,15 +49,12 @@ def weather_query():
         "date": datetime.now(),
         "match_prediction": True
     }
-    return current, location, data_model
+    print (f"{location['name']} current temperature: {current['temp_c']}")
+    return data_model
 
-
-
-def print_weather_data(weather_current, weather_location):
+# def print_weather_data(weather_current, weather_location):
     print(f"Location: {weather_location['name']}, current temperature is {weather_current['temp_c']} degrees Celsius")
     print(f"Date: {datetime.now()}")
-
-
 
 
 def mongodb_find():
@@ -144,8 +142,7 @@ def main():
         if choice == "exit":
             break
         elif choice == "1":
-            weather_current, weather_location, weather_data_model = weather_query()
-            print_weather_data(weather_current, weather_location)
+            weather_query()
         elif choice == "2":
             mongodb_find()
     print("Program ended")

@@ -1,18 +1,19 @@
 import os
-import requests
 from datetime import datetime
+
+import requests
+from bson.errors import InvalidId
+from bson.objectid import ObjectId
 from dotenv import load_dotenv
 from pymongo import MongoClient
+from pymongo.errors import PyMongoError
 from pymongo.server_api import ServerApi
-from bson.objectid import ObjectId
-
 
 load_dotenv()
 
 # MONGODB URL/API
 MONGODB_URL = os.getenv("MONGODB_URL")
 client = MongoClient(MONGODB_URL, server_api=ServerApi('1'))
-
 # Weather API Key
 API_KEY = os.getenv("API_KEY")
 BASE_URL = "https://api.weatherapi.com/v1"

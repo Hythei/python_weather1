@@ -13,21 +13,24 @@ load_dotenv()
 
 # MONGODB URL/API
 MONGODB_URL = os.getenv("MONGODB_URL")
-client = MongoClient(MONGODB_URL, server_api=ServerApi('1'))
 # Weather API Key
 API_KEY = os.getenv("API_KEY")
 BASE_URL = "https://api.weatherapi.com/v1"
 
+client = MongoClient(MONGODB_URL, server_api=ServerApi('1'))
+def get_mongo_db():
+    return client["weather_test1"]
 # This thing checks that we have a successful MongoDB connection
 def check_mongodb_connection():
     try:
         client.admin.command('ping')
         print("Connection to MongoDB successful")
-    except Exception as e:
-        print(f"Connection to MongoDB failed: {e}")
+    except PyMongoError as error:
+        print(f"Connection to MongoDB failed: {error}")
+    except RuntimeError as error:
+        print(f"MongoDB configuration error: {error}")
 
-def get_mongo_db():
-    return client["weather_test1"]
+
 
 # Write a function that combines weather query, weather printing, and mongodb_send here!
 

@@ -62,7 +62,7 @@ def mongodb_send(data_model):
 def mongodb_update():
     db = get_mongo_db()
     collection = db["weather_information"]
-    print("Use the ObjectId to update the document. This just changes the match_prediction to False.")
+    print("Use the ObjectId to update the document. This simply changes the match_prediction value.")
     target_id = input("Enter the ObjectId: ")
 
     try:
@@ -70,8 +70,11 @@ def mongodb_update():
     except:
         print("Invalid ObjectId. Please try again.")
         return
-
-    collection.update_one({"_id" : object_id}, {"$set" : {"match_prediction" : False}})
+    check_prediction = collection.find_one({"_id" : object_id})
+    if check_prediction.get("match_prediction"):
+        collection.update_one({"_id": object_id}, {"$set": {"match_prediction": False}})
+    else:
+        collection.update_one({"_id": object_id}, {"$set": {"match_prediction": True}})
     print("Document updated:")
     updated_document = collection.find_one({"_id" : object_id})
     print(updated_document)

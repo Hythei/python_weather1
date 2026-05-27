@@ -31,20 +31,9 @@ def weather_query():
     print (f"{location['name']} current temperature: {current['temp_c']}")
     return data_model
 
-# def print_weather_data(weather_current, weather_location):
-    print(f"Location: {weather_location['name']}, current temperature is {weather_current['temp_c']} degrees Celsius")
-    print(f"Date: {datetime.now()}")
-
 def main():
     mongo.check_mongodb_connection()
-    # weather_current, weather_location, weather_data_model = weather_query()
-    # print_weather_data(weather_current, weather_location)
-    # mongodb_send(weather_data_model)
-    # mongodb_find()
-    # mongodb_update()
-    # mongodb_delete()
     print("Program started")
-    # Create a while-loop for the main() function
     while True:
         print("Choose an action:")
         print("1. Query for weather data via Weather API")
@@ -52,7 +41,7 @@ def main():
         print("3. Update a document's match_prediction value on MongoDB")
         print("4. Delete a document from MongoDB")
         print("Type 'exit' to exit")
-        choice = input("Choice: ")
+        choice = input("Choice: ").lower().strip()
         if choice == "exit":
             break
         elif choice == "1":

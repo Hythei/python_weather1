@@ -1,4 +1,3 @@
-# This file will contain functions related to MongoDB when I get around to tidying up the main-file
 import os
 
 from bson.errors import InvalidId
@@ -30,7 +29,6 @@ def check_mongodb_connection():
 def mongodb_find():
     db = get_mongo_db()
     collection = db["weather_information"]
-    # Suppose we can leave the find() empty and it will return all the data
     enquiry = input("Find data in MongoDB? (y/n): ")
     if enquiry == 'n':
         return
@@ -83,8 +81,6 @@ def mongodb_delete():
     db = get_mongo_db()
     collection = db["weather_information"]
     print("Use the ObjectId to delete the document.")
-    # Initially we'll just use the object_id to delete the document
-    # Once delete_one has been proven to work, we'll see if delete_many works with location
     target_id = input("Enter the ObjectId: ")
     try:
         object_id = ObjectId(target_id)

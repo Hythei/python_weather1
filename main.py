@@ -49,14 +49,21 @@ def main():
         print("Choose an action:")
         print("1. Query for weather data via Weather API")
         print("2. Search for past weather data on MongoDB")
+        print("3. Update a document's match_prediction value on MongoDB")
+        print("4. Delete a document from MongoDB")
         print("Type 'exit' to exit")
         choice = input("Choice: ")
         if choice == "exit":
             break
         elif choice == "1":
-            weather_query()
+            data_model = weather_query()
+            mongo.mongodb_send(data_model)
         elif choice == "2":
             mongo.mongodb_find()
+        elif choice == "3":
+            mongo.mongodb_update()
+        elif choice == "4":
+            mongo.mongodb_delete()
     print("Program ended")
 
 if __name__ == "__main__":

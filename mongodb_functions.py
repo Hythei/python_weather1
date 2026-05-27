@@ -95,3 +95,4 @@ def mongodb_delete():
     print("Following document will be deleted from the collection")
     print(doc_to_be_removed)
     collection.delete_one({"_id": object_id})
+    print("Document deleted")

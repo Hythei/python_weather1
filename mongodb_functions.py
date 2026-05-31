@@ -1,4 +1,5 @@
 import os
+from datetime import datetime
 
 from bson.errors import InvalidId
 from bson.objectid import ObjectId
@@ -47,7 +48,8 @@ def mongodb_find():
         for item in item_details:
             print(item)
 
-def mongodb_send(data_model):
+# Added type hints to data_model. Datetime could be switched to a string, too.
+def mongodb_send(data_model: dict[str, str | float | bool | datetime]):
     db = get_mongo_db()
     collection = db["weather_information"]
     enquiry = input("Send data to MongoDB? (y/n): ")

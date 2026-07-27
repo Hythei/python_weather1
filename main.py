@@ -1,18 +1,20 @@
 import os
+from datetime import datetime
 from typing import Optional, List
+from dotenv import load_dotenv
 
 import pymongo
 from fastapi import FastAPI, Body, HTTPException, status
 from fastapi.responses import Response
 from pydantic import ConfigDict, BaseModel, Field, EmailStr
 from pydantic.functional_validators import BeforeValidator
-
 from typing_extensions import Annotated
-
 from bson import ObjectId
 import asyncio
 from pymongo import AsyncMongoClient
 from pymongo import ReturnDocument
+
+load_dotenv()
 
 # Weather API Key
 API_KEY = os.getenv("API_KEY")
@@ -31,11 +33,15 @@ PyObjectId = Annotated[str, BeforeValidator(str)]
 
 class WeatherInformationModel(BaseModel):
     id: Optional[PyObjectId] = Field(alias="_id", default=None)
-    location: str = Field(alias="location")
-    temperature: float = Field(alias="temperature")
-    date: str = Field(alias="date")
-    match_prediction: bool = Field(alias="match_prediction")
-    model_config = ConfigDict(from_attributes=True)
+    location: str
+    temperature: float
+    date: datetime
+    match_prediction: bool
+
+    model_config = ConfigDict(
+        from_attributes=True,
+        populate_by_name=True,
+    )
 
 class WeatherInformation(BaseModel):
     weather_information: List[WeatherInformationModel]
@@ -46,6 +52,5 @@ class WeatherInformation(BaseModel):
     response_model=WeatherInformation,
     response_model_by_alias=True,
 )
-
 async def get_weather_information():
-    return WeatherInformation(weather_information=await weather_collection.find({}).to_list(None))
+    return WeatherInformation(weather_information=await weather_collection.find({}).to_list(length=None))

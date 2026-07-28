@@ -54,3 +54,16 @@ class WeatherInformation(BaseModel):
 )
 async def get_weather_information():
     return WeatherInformation(weather_information=await weather_collection.find({}).to_list(length=None))
+
+@app.post(
+    "weather_information",
+    response_description="Add a new weather information",
+    response_model=WeatherInformationModel,
+    response_model_by_alias=True,
+)
+async def add_weather_information(weather_information: WeatherInformationModel = Body(...)):
+    new_weather_information =  weather_information.model_dump()
+    result = await weather_collection.insert_one(new_weather_information)
+    new_weather_information["id"] = result.inserted_id
+
+    return new_weather_information

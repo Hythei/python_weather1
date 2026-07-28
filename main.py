@@ -56,14 +56,14 @@ async def get_weather_information():
     return WeatherInformation(weather_information=await weather_collection.find({}).to_list(length=None))
 
 @app.post(
-    "weather_information",
+    "/weather_information",
     response_description="Add a new weather information",
     response_model=WeatherInformationModel,
+    status_code=status.HTTP_201_CREATED,
     response_model_by_alias=True,
 )
 async def add_weather_information(weather_information: WeatherInformationModel = Body(...)):
     new_weather_information =  weather_information.model_dump()
     result = await weather_collection.insert_one(new_weather_information)
-    new_weather_information["id"] = result.inserted_id
-
+    new_weather_information["_id"] = result.inserted_id
     return new_weather_information

@@ -44,10 +44,16 @@ class WeatherInformationModel(BaseModel):
     )
 
 class UpdateWeatherInformationModel(BaseModel):
+    id: Optional[PyObjectId] = Field(alias="_id", default=None)
     location: Optional[str] = None
     temperature: Optional[float] = None
-    date: datetime = None
-    match_prediction: bool = None
+    date: Optional[datetime] = None
+    match_prediction: Optional[bool] = None
+    model_config = ConfigDict(
+        from_attributes=True,
+        populate_by_name=True,
+    )
+
 
 class WeatherInformation(BaseModel):
     weather_information: List[WeatherInformationModel]
@@ -80,5 +86,13 @@ async def add_weather_information(weather_information: WeatherInformationModel =
     response_model=WeatherInformationModel,
     response_model_by_alias=True,
 )
-async def update_weather_information(weather_information: WeatherInformationModel = Body(...)):
-    weather_information_id = weather_information.id
+async def update_weather_information(weather_information: UpdateWeatherInformationModel = Body(...)):
+    weather_information = {
+        k: v for k, v in weather_information.model_dump().items() if v is not None
+    }
+    if len(weather_information) >= 1:
+        update_result = await weather_collection.find_one_and_update_one(
+            {"_id": ObjectId(weather_information["id"])},
+            {"$set": weather_information},
+            return_document=ReturnDocument.AFTER,
+        )

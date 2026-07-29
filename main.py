@@ -43,6 +43,12 @@ class WeatherInformationModel(BaseModel):
         populate_by_name=True,
     )
 
+class UpdateWeatherInformationModel(BaseModel):
+    location: Optional[str] = None
+    temperature: Optional[float] = None
+    date: datetime = None
+    match_prediction: bool = None
+
 class WeatherInformation(BaseModel):
     weather_information: List[WeatherInformationModel]
 
@@ -67,3 +73,12 @@ async def add_weather_information(weather_information: WeatherInformationModel =
     result = await weather_collection.insert_one(new_weather_information)
     new_weather_information["_id"] = result.inserted_id
     return new_weather_information
+
+@app.put(
+    "/weather_information/{id}",
+    response_description="Update a weather information",
+    response_model=WeatherInformationModel,
+    response_model_by_alias=True,
+)
+async def update_weather_information(weather_information: WeatherInformationModel = Body(...)):
+    weather_information_id = weather_information.id

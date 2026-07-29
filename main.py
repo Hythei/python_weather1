@@ -86,13 +86,43 @@ async def add_weather_information(weather_information: WeatherInformationModel =
     response_model=WeatherInformationModel,
     response_model_by_alias=True,
 )
-async def update_weather_information(weather_information: UpdateWeatherInformationModel = Body(...)):
-    weather_information = {
-        k: v for k, v in weather_information.model_dump().items() if v is not None
+async def update_weather_information(
+    id: str,
+    weather_information: UpdateWeatherInformationModel = Body(...),
+):
+    update_data = {
+        k: v
+        for k, v in weather_information.model_dump(exclude={"id"}).items()
+        if v is not None
     }
-    if len(weather_information) >= 1:
-        update_result = await weather_collection.find_one_and_update_one(
+
+    if not ObjectId.is_valid(id):
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Invalid weather information id",
+        )
+
+    existing_weather_information = await weather_collection.find_one(
+        {"_id": ObjectId(id)}
+    )
+
+    if existing_weather_information is None:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Weather information not found",
+        )
+
+    if not update_data:
+        return existing_weather_information
+        update_result = await weather_collection.find_one_and_update(
             {"_id": ObjectId(weather_information["id"])},
             {"$set": weather_information},
             return_document=ReturnDocument.AFTER,
         )
+        if update_result is not None:
+            return update_result
+        else:
+            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Weather information not found")
+    if (existing_weather_information := await weather_collection.find_one({"_id": ObjectId(weather_information["id"])})) is not None:
+        return existing_weather_information
+    raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Weather information not found")

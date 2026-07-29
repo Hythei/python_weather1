@@ -90,11 +90,11 @@ async def update_weather_information(
     id: str,
     weather_information: UpdateWeatherInformationModel = Body(...),
 ):
-    update_data = {
-        k: v
-        for k, v in weather_information.model_dump(exclude={"id"}).items()
-        if v is not None
-    }
+    update_data = weather_information.model_dump(
+            exclude={"id"},
+            exclude_unset=True,
+            exclude_none=True,
+        )
 
     if not ObjectId.is_valid(id):
         raise HTTPException(
@@ -114,15 +114,17 @@ async def update_weather_information(
 
     if not update_data:
         return existing_weather_information
-        update_result = await weather_collection.find_one_and_update(
-            {"_id": ObjectId(weather_information["id"])},
-            {"$set": weather_information},
-            return_document=ReturnDocument.AFTER,
-        )
-        if update_result is not None:
-            return update_result
-        else:
-            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Weather information not found")
-    if (existing_weather_information := await weather_collection.find_one({"_id": ObjectId(weather_information["id"])})) is not None:
-        return existing_weather_information
-    raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Weather information not found")
+
+    update_result = await weather_collection.find_one_and_update(
+        {"_id": ObjectId(id)},
+        {"$set": update_data},
+        return_document=ReturnDocument.AFTER,
+    )
+
+    if update_result is not None:
+        return update_result
+
+    raise HTTPException(
+        status_code=status.HTTP_404_NOT_FOUND,
+        detail="Weather information not found",
+    )

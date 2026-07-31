@@ -128,3 +128,12 @@ async def update_weather_information(
         status_code=status.HTTP_404_NOT_FOUND,
         detail="Weather information not found",
     )
+
+@app.delete("/weather_information/{id}",
+            response_description="Delete a weather information",
+            response_model=WeatherInformationModel,)
+async def delete_weather_information(id: str):
+    delete_result = await weather_collection.delete_one({"_id": ObjectId(id)})
+    if delete_result.deleted_count == 1:
+        return Response(status_code=status.HTTP_204_NO_CONTENT)
+    raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=f"Student {id} not found")

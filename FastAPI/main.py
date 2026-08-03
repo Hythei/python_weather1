@@ -31,7 +31,7 @@ weather_collection = db.get_collection("weather_information")
 PyObjectId = Annotated[str, BeforeValidator(str)]
 
 
-class WeatherInformationModel(BaseModel):
+class WeatherDocumentModel(BaseModel):
     id: Optional[PyObjectId] = Field(alias="_id", default=None)
     location: str
     temperature: float
@@ -43,7 +43,7 @@ class WeatherInformationModel(BaseModel):
         populate_by_name=True,
     )
 
-class UpdateWeatherInformationModel(BaseModel):
+class UpdateWeatherDocumentModel(BaseModel):
     id: Optional[PyObjectId] = Field(alias="_id", default=None)
     location: Optional[str] = None
     temperature: Optional[float] = None
@@ -55,26 +55,26 @@ class UpdateWeatherInformationModel(BaseModel):
     )
 
 
-class WeatherInformation(BaseModel):
-    weather_information: List[WeatherInformationModel]
+class WeatherDocuments(BaseModel):
+    weather_information: List[WeatherDocumentModel]
 
 @app.get(
     "/weather_information",
     response_description="Get all weather information",
-    response_model=WeatherInformation,
+    response_model=WeatherDocuments,
     response_model_by_alias=True,
 )
 async def get_weather_information():
-    return WeatherInformation(weather_information=await weather_collection.find({}).to_list(length=None))
+    return WeatherDocuments(weather_information=await weather_collection.find({}).to_list(length=None))
 
 @app.post(
     "/weather_information",
     response_description="Add a new weather information",
-    response_model=WeatherInformationModel,
+    response_model=WeatherDocumentModel,
     status_code=status.HTTP_201_CREATED,
     response_model_by_alias=True,
 )
-async def add_weather_information(weather_information: WeatherInformationModel = Body(...)):
+async def add_weather_information(weather_information: WeatherDocumentModel = Body(...)):
     new_weather_information =  weather_information.model_dump()
     result = await weather_collection.insert_one(new_weather_information)
     new_weather_information["_id"] = result.inserted_id
@@ -83,12 +83,12 @@ async def add_weather_information(weather_information: WeatherInformationModel =
 @app.put(
     "/weather_information/{id}",
     response_description="Update a weather information",
-    response_model=WeatherInformationModel,
+    response_model=WeatherDocumentModel,
     response_model_by_alias=True,
 )
 async def update_weather_information(
     id: str,
-    weather_information: UpdateWeatherInformationModel = Body(...),
+    weather_information: UpdateWeatherDocumentModel = Body(...),
 ):
     update_data = weather_information.model_dump(
             exclude={"id"},
@@ -131,7 +131,7 @@ async def update_weather_information(
 
 @app.delete("/weather_information/{id}",
             response_description="Delete a weather information",
-            response_model=WeatherInformationModel,)
+            response_model=WeatherDocumentModel, )
 async def delete_weather_information(id: str):
     delete_result = await weather_collection.delete_one({"_id": ObjectId(id)})
     if delete_result.deleted_count == 1:

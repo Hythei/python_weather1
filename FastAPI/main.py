@@ -14,6 +14,8 @@ import asyncio
 from pymongo import AsyncMongoClient
 from pymongo import ReturnDocument
 
+from fastapi.middleware.cors import CORSMiddleware
+
 load_dotenv()
 
 # Weather API Key
@@ -24,6 +26,13 @@ app = FastAPI(
     title="Weather Information API",
     summary="A simple application to fetch information from Weather Information API",
 )
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
 client = AsyncMongoClient(os.getenv("MONGODB_URL"), server_api=pymongo.server_api.ServerApi(version="1", strict=True,deprecation_errors=True))
 db = client.weather_test1
 weather_collection = db.get_collection("weather_information")
@@ -65,7 +74,8 @@ class WeatherDocuments(BaseModel):
     response_model_by_alias=True,
 )
 async def get_weather_information():
-    return WeatherDocuments(weather_information=await weather_collection.find({}).to_list(length=None))
+    weather_Documents = list(await weather_collection.find({}).to_list(length=None))
+    return {"weather_information": weather_Documents}
 
 @app.post(
     "/weather_information",

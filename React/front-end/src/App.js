@@ -3,8 +3,11 @@ import api from './api'
 
 const App = () => {
     const [documents, setDocuments] = useState([])
-//    const [formData, setFormData] = useState({
-// }
+    const [formData, setFormData] = useState({
+        location: '',
+        temperature: '',
+        match_prediction: false,
+    })
 
     const fetchWeatherDocuments = async () => {
         const response = await api.get('/weather_information');
@@ -14,6 +17,14 @@ const App = () => {
     useEffect(() => {
         fetchWeatherDocuments();
     }, []);
+
+    const handleInputChange = (e) => {
+        const prediction = e.target.type === 'checkbox' ? e.target.checked : e.target.value;
+        setFormData({
+            ...formData,
+            [e.target.name]: prediction
+        })
+    }
 
     return (
         <div className="container mt-4">

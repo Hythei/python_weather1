@@ -42,6 +42,19 @@ const App = () => {
             </nav>
             <div className="container">
                 <from onSubmit={handleFormSubmit}>
+                    <div className="mb-3 mt-3">
+                        <label htmlFor="location" className="form-label">Location</label>
+                        <input type="text" className="form-control" id="location" name="location" value={formData.location} onChange={handleInputChange} />
+                    </div>
+                    <div className="mb-3">
+                        <label htmlFor="temperature" className="form-label">Temperature</label>
+                        <input type="number" className="form-control" id="temperature" name="temperature" value={formData.temperature} onChange={handleInputChange} />
+                    </div>
+                    <div className="mb-3">
+                        <label htmlFor="match_prediction" className="form-label">Match prediction</label>
+                        <input type="checkbox" className="form-check-input" id="match_prediction" name="match_prediction" checked={formData.match_prediction} onChange={handleInputChange} />
+
+                    </div>
 
                 </from>
             </div>

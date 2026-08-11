@@ -5,8 +5,9 @@ const App = () => {
     const [documents, setDocuments] = useState([])
     const [formData, setFormData] = useState({
         location: '',
-        temperature: '',
+        temperature: 0,
         match_prediction: false,
+        date: '',
     })
 
     const fetchWeatherDocuments = async () => {
@@ -28,8 +29,21 @@ const App = () => {
 
     const handleFormSubmit = async (event) => {
         event.preventDefault();
-
-    }
+        const submissionData = {
+            location: formData.location,
+            temperature: parseFloat(formData.temperature),
+            match_prediction: formData.match_prediction,
+            date: new Date().toISOString(),
+        }
+        await api.post('/weather_information', submissionData);
+        await fetchWeatherDocuments();
+        setFormData({
+            location: '',
+            temperature: '',
+            match_prediction: false,
+            date: new Date().toLocaleString(),
+        });
+    };
 
     return (
         <div>
@@ -41,7 +55,7 @@ const App = () => {
                 </div>
             </nav>
             <div className="container">
-                <from onSubmit={handleFormSubmit}>
+                <form onSubmit={handleFormSubmit}>
                     <div className="mb-3 mt-3">
                         <label htmlFor="location" className="form-label">Location</label>
                         <input type="text" className="form-control" id="location" name="location" value={formData.location} onChange={handleInputChange} />
@@ -53,10 +67,10 @@ const App = () => {
                     <div className="mb-3">
                         <label htmlFor="match_prediction" className="form-label">Match prediction</label>
                         <input type="checkbox" className="form-check-input" id="match_prediction" name="match_prediction" checked={formData.match_prediction} onChange={handleInputChange} />
-
                     </div>
+                    <button type="submit" className="btn btn-primary">Submit</button>
 
-                </from>
+                </form>
             </div>
             <div className="container mt-4">
                 <table className="table table-striped table-bordered table-hover">

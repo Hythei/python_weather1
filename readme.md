@@ -9,3 +9,4 @@ Uvicorn
 MongoDB
 React
 Axios
+Bootstrap

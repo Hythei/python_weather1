@@ -45,6 +45,15 @@ const App = () => {
         });
     };
 
+    const deleteDocument = async (documentId) => {
+        try {
+            await api.delete(`/weather_information/${documentId}`);
+            await fetchWeatherDocuments();
+        } catch (error) {
+            console.error('Error deleting document:', error);
+        }
+    }
+
     return (
         <div>
             <nav className="navbar navbar-expand-lg navbar-light bg-light">
@@ -54,7 +63,24 @@ const App = () => {
                     </a>
                 </div>
             </nav>
+            <>
+                <div className="container">
+                    <h1 className="mt-4">Fetch from API</h1>
+                    <form>
+                        <div>
+                            <label htmlFor="location">Location</label>
+                            <input type="text" id="location" name="location" />
+                            <button type="submit">Submit</button>
+                        </div>
+                    </form>
+                    <div className="mt-4">
+                        <h2>Weather information</h2>
+
+                    </div>
+                </div>
+            </>
             <div className="container">
+                <h1 className="mt-4">Add directly to collection</h1>
                 <form onSubmit={handleFormSubmit}>
                     <div className="mb-3 mt-3">
                         <label htmlFor="location" className="form-label">Location</label>
@@ -81,6 +107,7 @@ const App = () => {
                             <th>Temperature</th>
                             <th>Match prediction</th>
                             <th>Date</th>
+                            <th></th>
                         </tr>
                     </thead>
                     <tbody>
@@ -91,6 +118,13 @@ const App = () => {
                                 <td>{document.temperature}</td>
                                 <td>{document.match_prediction ? "Yes" : "No"}</td>
                                 <td>{document.date}</td>
+                                <td>
+                                    <button
+                                    onClick={ () => deleteDocument(document._id)}
+                                    className="btn btn-primary">
+                                    DEL
+                                    </button>
+                                </td>
                             </tr>
                         ))}
                     </tbody>

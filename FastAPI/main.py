@@ -77,6 +77,10 @@ async def get_weather_information():
     weather_Documents = list(await weather_collection.find({}).to_list(length=None))
     return {"weather_information": weather_Documents}
 
+@app.get(
+    "/weather_"
+)
+
 @app.post(
     "/weather_information",
     response_description="Add a new weather information",

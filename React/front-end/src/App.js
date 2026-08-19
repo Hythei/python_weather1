@@ -9,6 +9,8 @@ const App = () => {
         match_prediction: false,
         date: '',
     })
+    const [apiLocation, setApiLocation] = useState('')
+    const [apiWeatherData, setApiWeatherData] = useState(null)
 
     const fetchWeatherDocuments = async () => {
         const response = await api.get('/weather_information');
@@ -45,6 +47,21 @@ const App = () => {
         });
     };
 
+    const handleApiFetch = async (event) => {
+        event.preventDefault();
+        if (!apiLocation) return;
+        try {
+            const response = await api.get('/weather_information/fetch', {
+                params: { location: apiLocation }
+            });
+            setApiWeatherData(response.data);
+            await fetchWeatherDocuments();
+            setApiLocation('');
+        } catch (error) {
+            console.error('Error fetching weather data:', error);
+        }
+    };
+
     const deleteDocument = async (documentId) => {
         try {
             await api.delete(`/weather_information/${documentId}`);
@@ -54,11 +71,22 @@ const App = () => {
         }
     }
 
+    const updateDocument = async (documentId, matchPrediction) => {
+        try {
+            await api.put(`/weather_information/${documentId}`, {
+                match_prediction: matchPrediction,
+            });
+            await fetchWeatherDocuments();
+        } catch (error) {
+            console.error('Error updating document:', error);
+        }
+    }
+
     return (
         <div>
             <nav className="navbar navbar-expand-lg navbar-light bg-light">
                 <div className="container-fluid">
-                    <a className="navbar-brand" href="#">
+                    <a className="navbar-brand" href="#root">
                         Weather CRUD
                     </a>
                 </div>
@@ -66,16 +94,30 @@ const App = () => {
             <>
                 <div className="container">
                     <h1 className="mt-4">Fetch from API</h1>
-                    <form>
-                        <div>
-                            <label htmlFor="location">Location</label>
-                            <input type="text" id="location" name="location" />
-                            <button type="submit">Submit</button>
+                    <form onSubmit={handleApiFetch}>
+                        <div className="mb-3 mt-3">
+                            <label htmlFor="fetch-location" className="form-label">Location</label>
+                            <input
+                                type="text"
+                                className="form-control"
+                                id="fetch-location"
+                                name="location"
+                                value={apiLocation}
+                                onChange={(e) => setApiLocation(e.target.value)}
+                            />
                         </div>
+                        <button type="submit" className="btn btn-primary">Fetch</button>
                     </form>
                     <div className="mt-4">
                         <h2>Weather information</h2>
-
+                        {apiWeatherData && (
+                            <div>
+                                <p><strong>Location:</strong> {apiWeatherData.location}</p>
+                                <p><strong>Temperature:</strong> {apiWeatherData.temperature} °C</p>
+                                <p><strong>Date:</strong> {apiWeatherData.date}</p>
+                                <p><strong>Match prediction:</strong> {apiWeatherData.match_prediction ? "Yes" : "No"}</p>
+                            </div>
+                        )}
                     </div>
                 </div>
             </>
@@ -116,7 +158,16 @@ const App = () => {
                                 <td>{document._id}</td>
                                 <td>{document.location}</td>
                                 <td>{document.temperature}</td>
-                                <td>{document.match_prediction ? "Yes" : "No"}</td>
+                                <td>
+                                    <input
+                                        type="checkbox"
+                                        className="form-check-input me-2"
+                                        checked={document.match_prediction}
+                                        onChange={(event) => updateDocument(document._id, event.target.checked)}
+                                    />
+                                    {document.match_prediction ? "Yes" : "No"}
+                                </td>
+
                                 <td>{document.date}</td>
                                 <td>
                                     <button

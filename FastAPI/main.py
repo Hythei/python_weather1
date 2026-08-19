@@ -2,15 +2,15 @@ import os
 from datetime import datetime
 from typing import Optional, List
 from dotenv import load_dotenv
+import requests
 
 import pymongo
-from fastapi import FastAPI, Body, HTTPException, status
+from fastapi import FastAPI, Body, HTTPException, Query, status
 from fastapi.responses import Response
-from pydantic import ConfigDict, BaseModel, Field, EmailStr
+from pydantic import ConfigDict, BaseModel, Field
 from pydantic.functional_validators import BeforeValidator
 from typing_extensions import Annotated
 from bson import ObjectId
-import asyncio
 from pymongo import AsyncMongoClient
 from pymongo import ReturnDocument
 
@@ -32,6 +32,8 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+
 
 client = AsyncMongoClient(os.getenv("MONGODB_URL"), server_api=pymongo.server_api.ServerApi(version="1", strict=True,deprecation_errors=True))
 db = client.weather_test1
@@ -63,9 +65,48 @@ class UpdateWeatherDocumentModel(BaseModel):
         populate_by_name=True,
     )
 
-
 class WeatherDocuments(BaseModel):
     weather_information: List[WeatherDocumentModel]
+
+def fetchWeatherFromAPI(location: str) -> dict:
+    weatherApiParams = {
+        "key": API_KEY,
+        "q": location,
+        "aqi": "no"
+    }
+    response = requests.get(f"{BASE_URL}/current.json", params=weatherApiParams)
+    if not response.ok:
+        try:
+            error = response.json().get("error", {})
+            msg = error.get("message", "Failed to fetch weather data from WeatherAPI")
+        except Exception:
+            msg = "Failed to fetch weather data from WeatherAPI"
+        raise HTTPException(
+            status_code=response.status_code if response.status_code in (400, 404) else status.HTTP_502_BAD_GATEWAY,
+            detail=msg,
+        )
+    return response.json()
+
+@app.get(
+    "/weather_information/fetch",
+    response_description="Get the location's weather information from WeatherAPI and save to database",
+    response_model=WeatherDocumentModel,
+    response_model_by_alias=True,
+)
+async def fetch_weather_information(location: str = Query(...)):
+    data = fetchWeatherFromAPI(location)
+    current = data["current"]
+    location_data = data["location"]
+    # Dictionary that will be sent to MongoDB
+    data_model = {
+        "location": location_data['name'],
+        "temperature": current['temp_c'],
+        "date": datetime.now(),
+        "match_prediction": True
+    }
+    result = await weather_collection.insert_one(data_model)
+    data_model["_id"] = result.inserted_id
+    return data_model
 
 @app.get(
     "/weather_information",
@@ -76,10 +117,6 @@ class WeatherDocuments(BaseModel):
 async def get_weather_information():
     weather_Documents = list(await weather_collection.find({}).to_list(length=None))
     return {"weather_information": weather_Documents}
-
-@app.get(
-    "/weather_"
-)
 
 @app.post(
     "/weather_information",
@@ -150,4 +187,4 @@ async def delete_weather_information(id: str):
     delete_result = await weather_collection.delete_one({"_id": ObjectId(id)})
     if delete_result.deleted_count == 1:
         return Response(status_code=status.HTTP_204_NO_CONTENT)
-    raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=f"Student {id} not found")
+    raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=f"Weather information {id} not found")

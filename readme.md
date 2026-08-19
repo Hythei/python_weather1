@@ -40,9 +40,10 @@ Backend (FastAPI)
 3. Create a .env file in the project root with the following values (example):
 
    API_KEY=your_weatherapi_key_here
+   
    MONGODB_URL=
 
-4. Start the FastAPI server:
+5. Start the FastAPI server:
 
    uvicorn FastAPI.main:app --reload --host 0.0.0.0 --port 8000
 
